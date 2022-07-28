@@ -15,5 +15,4 @@ Just use Composer:
 ```
 composer require semperton/multibase
 ```
-Multibase requires PHP 7.2+
-
+Multibase requires PHP 7.4+ and the mbstring extension
