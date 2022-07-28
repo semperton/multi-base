@@ -1,0 +1,23 @@
+{
+    "name": "semperton/multibase",
+    "description": "Base transcoder with multibyte character alphabet support.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.2",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Semperton\\Multibase\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit tests",
+        "check": "psalm"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "vimeo/psalm": "^4.24"
+    }
+}
