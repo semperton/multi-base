@@ -44,4 +44,12 @@ final class TranscoderTest extends TestCase
 		$decoded = $transcoder->decode($encoded);
 		$this->assertEquals($data, $decoded);
 	}
+
+	public function testInvalidChars(): void
+	{
+		$this->expectException(InvalidArgumentException::class);
+
+		$transcoder = new Transcoder('0123456789abcdef');
+		$transcoder->decode('1acF');
+	}
 }
