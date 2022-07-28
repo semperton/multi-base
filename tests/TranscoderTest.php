@@ -48,8 +48,9 @@ final class TranscoderTest extends TestCase
 	public function testInvalidChars(): void
 	{
 		$this->expectException(InvalidArgumentException::class);
+		$this->expectExceptionMessage('String contains invalid chars < A= >');
 
 		$transcoder = new Transcoder('0123456789abcdef');
-		$transcoder->decode('1acF');
+		$transcoder->decode('1Acf=');
 	}
 }

@@ -83,8 +83,8 @@ class Transcoder implements TranscoderInterface
 		/** @var string[] */
 		$data = mb_str_split($string);
 
-		if (!!array_diff($data, $this->alphabet)) {
-			throw new InvalidArgumentException('Parameter < $string > contains chars missing in alphabet');
+		if ($diff = array_diff($data, $this->alphabet)) {
+			throw new InvalidArgumentException('String contains invalid chars < ' . implode('', $diff) . ' >');
 		}
 
 		/** @var int[] */
