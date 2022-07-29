@@ -24,7 +24,7 @@ Included base transcoders:
 - Base85 RFC 1924
 
 ## Usage
-Multibase transcoders are able to convert any (binary) string.
+Multibase transcoders are able to convert any arbitrary data.
 Use them as URL / MD5 shorteners, password generators, Base64 alternatives...
 
 ```php
