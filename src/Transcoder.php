@@ -17,6 +17,14 @@ class Transcoder implements TranscoderInterface
 		/** @var string[] */
 		$this->alphabet = mb_str_split($alphabet);
 		$this->base = count($this->alphabet);
+
+		if ($this->base < 2) {
+			throw new InvalidArgumentException('Alphabet must contain at least two chars');
+		}
+
+		if ($diff = array_diff_key($this->alphabet, array_unique($this->alphabet))) {
+			throw new InvalidArgumentException('Alphabet has dublicate chars < ' . implode('', array_unique($diff)) . ' >');
+		}
 	}
 
 	/**
