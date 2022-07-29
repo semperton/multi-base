@@ -30,14 +30,14 @@ class Transcoder implements TranscoderInterface
 	/**
 	 * @param int[] $values
 	 * @return int[]
-	 * @see https://stackoverflow.com/questions/352434/base-conversion-of-arbitrary-sized-numbers-php#answer-4848526
 	 */
 	public static function convert(array $values, int $fromBase, int $toBase): array
 	{
 		$count = count($values);
 		$result = [];
 
-		do {
+		while ($count > 0) {
+
 			$divide = 0;
 			$newlen = 0;
 
@@ -55,10 +55,10 @@ class Transcoder implements TranscoderInterface
 			}
 
 			$count = $newlen;
-			array_unshift($result, $divide);
-		} while ($newlen != 0);
+			$result[] = $divide;
+		}
 
-		return $result;
+		return array_reverse($result);
 	}
 
 	public function encode(string $string): string
@@ -70,13 +70,10 @@ class Transcoder implements TranscoderInterface
 
 		$converted = $this->convert($data, 256, $this->base);
 
-		$result = array_reduce($converted, function ($carry, $index) {
-			/**
-			 * @var string $carry
-			 * @var int $index
-			 */
-			return $carry . $this->alphabet[$index];
-		}, '');
+		$result = '';
+		foreach ($converted as $index) {
+			$result .= $this->alphabet[$index];
+		}
 
 		// zero padding
 		for ($i = 0; isset($data[$i + 1]) && $data[$i] === 0; $i++) {
@@ -97,10 +94,12 @@ class Transcoder implements TranscoderInterface
 
 		/** @var int[] */
 		$flipped = array_flip($this->alphabet);
-		$data = array_map(static function ($char) use ($flipped) {
-			return $flipped[$char];
-		}, $data);
 
+		foreach ($data as $index => $char) {
+			$data[$index] = $flipped[$char];
+		}
+
+		/** @var int[] $data */
 		$converted = $this->convert($data, $this->base, 256);
 
 		// zero padding
