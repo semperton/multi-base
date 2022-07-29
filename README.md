@@ -16,3 +16,53 @@ Just use Composer:
 composer require semperton/multibase
 ```
 Multibase requires PHP 7.4+ and the mbstring extension
+
+## Package
+Included base transcoders:
+- Base58
+- Base62
+- Base85 RFC 1924
+
+## Usage
+Multibase transcoders are able to convert any (binary) string.
+Use them as URL / MD5 shorteners, password generators, Base64 alternatives...
+
+```php
+use Semperton\Multibase\Base62;
+use Semperton\Multibase\Base85;
+
+// basic usage
+$base62 = new Base62();
+$base62->encode('Hello World'); // 73XpUgyMwkGr29M
+$base62->decode('73XpUgyMwkGr29M'); // Hello World
+
+// shorten md5 hash
+$hash = md5('Hello World'); // b10a8db164e0754105b7a99be72e3fe5
+
+$short = $base62->encode(hex2bin($hash)); // 5O4SoozqXEOwlYtvkC5zkr
+$short = $base62->encode(md5('Hello World', true)); // same as above
+
+$decoded = $base62->decode($short);
+$hash === bin2hex($decoded); // true
+
+// password generation
+$bytes = openssl_random_pseudo_bytes(16);
+$password = (new Base85())->encode($bytes); // e.g. Ncg>RWSYO+2t@~G8PO0J
+
+```
+
+## Custom transcoders
+You can create custom transcoders with your own alphabets (multibyte support).
+Just for fun, how about an emoji transcoder?
+
+```php
+use Semperton\Multibase\Transcoder;
+
+$emojiTranscoder = new Transcoder(
+	'🧳🌂☂️🧵🪡🪢🧶👓🕶🥽🥼🦺👔👕👖🧣🧤🧥🧦👗👘🥻🩴🩱🩲' .
+	'🩳👙👚👛👜👝🎒👞👟🥾🥿👠👡🩰👢👑👒🎩🎓🧢⛑🪖💄💍💼'
+);
+
+$encoded = $transcoder->encode('Hello World'); // ☂🪢👟🩴🩰🥻👚👙🧢🩲🧥🥽🎩👙👝🎒
+$transcoder->decode($encoded); // Hello World
+```
