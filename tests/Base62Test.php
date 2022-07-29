@@ -71,4 +71,19 @@ final class Base62Test extends TestCase
 		$decoded = $transcoder->decode($encoded);
 		$this->assertEquals($data, $decoded);
 	}
+
+	public function testMd5(): void
+	{
+		$transcoder = new Base62();
+		$data = 'Hello World';
+		$md5 = md5($data);
+
+		$encoded = $transcoder->encode(md5($data, true));
+
+		$this->assertEquals('5O4SoozqXEOwlYtvkC5zkr', $encoded);
+
+		$decoded = $transcoder->decode($encoded);
+
+		$this->assertEquals($md5, bin2hex($decoded));
+	}
 }
