@@ -61,4 +61,20 @@ final class TranscoderTest extends TestCase
 
 		$transcoder = new Transcoder('aBCadeff');
 	}
+
+	public function testEmptyDecodeString(): void
+	{
+		$transcoder = new Transcoder('0123456789');
+		$encoded = $transcoder->decode('');
+
+		$this->assertEquals('', $encoded);
+	}
+
+	public function testEmptyEncodeString(): void
+	{
+		$transcoder = new Transcoder('0123456789');
+		$encoded = $transcoder->encode('');
+
+		$this->assertEquals('', $encoded);
+	}
 }
