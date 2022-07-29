@@ -12,7 +12,7 @@ use Semperton\Multibase\Base85;
  * @OutputTimeUnit("seconds")
  * @OutputMode("throughput")
  */
-final class MatcherBench
+final class TranscoderBench
 {
 	protected string $data;
 
