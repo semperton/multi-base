@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Semperton\Multibase;
 
-use InvalidArgumentException;
+use Semperton\Multibase\Exception\DublicateCharsException;
+use Semperton\Multibase\Exception\InvalidAlphabetException;
+use Semperton\Multibase\Exception\InvalidCharsException;
 
 class Transcoder implements TranscoderInterface
 {
@@ -19,11 +21,13 @@ class Transcoder implements TranscoderInterface
 		$this->base = count($this->alphabet);
 
 		if ($this->base < 2) {
-			throw new InvalidArgumentException('Alphabet must contain at least two chars');
+			throw new InvalidAlphabetException('Alphabet must contain at least two chars');
 		}
 
-		if ($diff = array_diff_key($this->alphabet, array_unique($this->alphabet))) {
-			throw new InvalidArgumentException('Alphabet has dublicate chars < ' . implode('', array_unique($diff)) . ' >');
+		if ($chars = array_diff_key($this->alphabet, array_unique($this->alphabet))) {
+			$exception = new DublicateCharsException('Alphabet contains dublicate chars');
+			$exception->setChars(array_unique($chars));
+			throw $exception;
 		}
 	}
 
@@ -88,8 +92,10 @@ class Transcoder implements TranscoderInterface
 		/** @var string[] */
 		$data = mb_str_split($string);
 
-		if ($diff = array_diff($data, $this->alphabet)) {
-			throw new InvalidArgumentException('String contains invalid chars < ' . implode('', $diff) . ' >');
+		if ($chars = array_diff($data, $this->alphabet)) {
+			$exception = new InvalidCharsException('String contains invalid chars');
+			$exception->setChars($chars);
+			throw $exception;
 		}
 
 		/** @var int[] */
@@ -103,10 +109,11 @@ class Transcoder implements TranscoderInterface
 		$converted = $this->convert($data, $this->base, 256);
 
 		// zero padding
+		$zeros = [];
 		for ($i = 0; isset($data[$i + 1]) && $data[$i] === 0; $i++) {
-			array_unshift($converted, 0);
+			$zeros[] = 0;
 		}
 
-		return pack('C*', ...$converted);
+		return pack('C*', ...$zeros, ...$converted);
 	}
 }

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use Semperton\Multibase\Exception\DublicateCharsException;
+use Semperton\Multibase\Exception\InvalidCharsException;
 use Semperton\Multibase\Transcoder;
 
 final class TranscoderTest extends TestCase
@@ -47,8 +49,7 @@ final class TranscoderTest extends TestCase
 
 	public function testInvalidDecodeChars(): void
 	{
-		$this->expectException(InvalidArgumentException::class);
-		$this->expectExceptionMessage('String contains invalid chars < A= >');
+		$this->expectException(InvalidCharsException::class);
 
 		$transcoder = new Transcoder('0123456789abcdef');
 		$transcoder->decode('1Acf=');
@@ -56,8 +57,7 @@ final class TranscoderTest extends TestCase
 
 	public function testDublicateAlphabetChars(): void
 	{
-		$this->expectException(InvalidArgumentException::class);
-		$this->expectExceptionMessage('Alphabet has dublicate chars < af >');
+		$this->expectException(DublicateCharsException::class);
 
 		$transcoder = new Transcoder('aBCadeff');
 	}
