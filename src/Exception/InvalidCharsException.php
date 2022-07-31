@@ -9,7 +9,7 @@ use RuntimeException;
 class InvalidCharsException extends RuntimeException
 {
 	/** @var string[] */
-	protected ?array $chars = null;
+	protected array $chars = [];
 
 	/**
 	 * @param string[] $chars
@@ -20,9 +20,9 @@ class InvalidCharsException extends RuntimeException
 	}
 
 	/**
-	 * @return null|string[]
+	 * @return string[]
 	 */
-	public function getChars(): ?array
+	public function getChars(): array
 	{
 		return $this->chars;
 	}
