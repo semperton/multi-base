@@ -49,17 +49,21 @@ final class TranscoderTest extends TestCase
 
 	public function testInvalidDecodeChars(): void
 	{
-		$this->expectException(InvalidCharsException::class);
-
-		$transcoder = new Transcoder('0123456789abcdef');
-		$transcoder->decode('1Acf=');
+		try {
+			$transcoder = new Transcoder('0123456789abcdef');
+			$transcoder->decode('1Acf=');
+		} catch (InvalidCharsException $ex) {
+			$this->assertSame([1 => 'A', 4 => '='], $ex->getChars());
+		}
 	}
 
 	public function testDublicateAlphabetChars(): void
 	{
-		$this->expectException(DublicateCharsException::class);
-
-		$transcoder = new Transcoder('aBCadeff');
+		try {
+			$transcoder = new Transcoder('aBCadeff');
+		} catch (DublicateCharsException $ex) {
+			$this->assertSame([3 => 'a', 7 => 'f'], $ex->getChars());
+		}
 	}
 
 	public function testEmptyDecodeString(): void
