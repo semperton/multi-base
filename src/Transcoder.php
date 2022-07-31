@@ -10,9 +10,13 @@ use Semperton\Multibase\Exception\InvalidCharsException;
 
 class Transcoder implements TranscoderInterface
 {
+	protected int $base;
+
 	/** @var string[] */
 	protected array $alphabet;
-	protected int $base;
+
+	/** @var null|int[] */
+	protected ?array $flipped = null;
 
 	public function __construct(string $alphabet)
 	{
@@ -92,17 +96,21 @@ class Transcoder implements TranscoderInterface
 		/** @var string[] */
 		$data = mb_str_split($string);
 
+		// unlike str_split, mb_str_split returns empty array on empty string
+		// so we are save here...
 		if ($chars = array_diff($data, $this->alphabet)) {
 			$exception = new InvalidCharsException('String contains invalid chars');
 			$exception->setChars($chars);
 			throw $exception;
 		}
 
-		/** @var int[] */
-		$flipped = array_flip($this->alphabet);
+		if (!$this->flipped) {
+			/** @var int[] */
+			$this->flipped = array_flip($this->alphabet);
+		}
 
 		foreach ($data as $index => $char) {
-			$data[$index] = $flipped[$char];
+			$data[$index] = $this->flipped[$char];
 		}
 
 		/** @var int[] $data */
