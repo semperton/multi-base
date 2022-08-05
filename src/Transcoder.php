@@ -8,6 +8,17 @@ use Semperton\Multibase\Exception\DublicateCharsException;
 use Semperton\Multibase\Exception\InvalidAlphabetException;
 use Semperton\Multibase\Exception\InvalidCharsException;
 
+use function mb_str_split;
+use function array_diff;
+use function array_diff_key;
+use function array_unique;
+use function array_reverse;
+use function array_values;
+use function array_flip;
+use function count;
+use function unpack;
+use function pack;
+
 class Transcoder implements TranscoderInterface
 {
 	protected int $base;
@@ -46,24 +57,24 @@ class Transcoder implements TranscoderInterface
 
 		while ($count > 0) {
 
-			$divide = 0;
-			$newlen = 0;
+			$remainder = 0;
+			$length = 0;
 
 			for ($i = 0; $i < $count; ++$i) {
 
-				$divide = $divide * $fromBase + $values[$i];
+				$remainder = $remainder * $fromBase + $values[$i];
 
-				if ($divide >= $toBase) {
+				if ($remainder >= $toBase) {
 
-					$values[$newlen++] = (int)($divide / $toBase);
-					$divide = $divide % $toBase;
-				} else if ($newlen > 0) {
-					$values[$newlen++] = 0;
+					$values[$length++] = (int)($remainder / $toBase);
+					$remainder = $remainder % $toBase;
+				} else if ($length > 0) {
+					$values[$length++] = 0;
 				}
 			}
 
-			$count = $newlen;
-			$result[] = $divide;
+			$count = $length;
+			$result[] = $remainder;
 		}
 
 		return array_reverse($result);
