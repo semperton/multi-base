@@ -21,5 +21,8 @@
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.24",
         "phpbench/phpbench": "^1.2"
+    },
+    "suggest": {
+        "ext-gmp": "Install GMP extension for fast conversion up to base 62."
     }
 }

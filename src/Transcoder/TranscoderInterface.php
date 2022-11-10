@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Semperton\Multibase;
+namespace Semperton\Multibase\Transcoder;
 
 interface TranscoderInterface
 {

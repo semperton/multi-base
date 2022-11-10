@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Semperton\Multibase;
 
-final class Base62 extends Transcoder
+use Semperton\Multibase\Transcoder\BaseTranscoder;
+
+final class Base62 extends BaseTranscoder
 {
 	public function __construct()
 	{

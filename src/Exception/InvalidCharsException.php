@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Semperton\Multibase\Exception;
 
-use RuntimeException;
+use InvalidArgumentException;
 
-class InvalidCharsException extends RuntimeException
+class InvalidCharsException extends InvalidArgumentException
 {
 	/** @var string[] */
 	protected array $chars = [];

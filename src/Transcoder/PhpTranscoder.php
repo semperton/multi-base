@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Semperton\Multibase;
+namespace Semperton\Multibase\Transcoder;
 
 use Semperton\Multibase\Exception\DublicateCharsException;
 use Semperton\Multibase\Exception\InvalidAlphabetException;
@@ -19,19 +19,19 @@ use function count;
 use function unpack;
 use function pack;
 
-class Transcoder implements TranscoderInterface
+final class PhpTranscoder implements TranscoderInterface
 {
 	protected int $base;
 
-	/** @var string[] */
+	/** @var array<int, string> */
 	protected array $alphabet;
 
-	/** @var null|int[] */
-	protected ?array $flipped = null;
+	/** @var array<string, int> */
+	protected array $flipped;
 
 	public function __construct(string $alphabet)
 	{
-		/** @var string[] */
+		/** @var array<int, string> */
 		$this->alphabet = mb_str_split($alphabet);
 		$this->base = count($this->alphabet);
 
@@ -44,6 +44,8 @@ class Transcoder implements TranscoderInterface
 			$exception->setChars(array_unique($chars));
 			throw $exception;
 		}
+
+		$this->flipped = array_flip($this->alphabet);
 	}
 
 	/**
@@ -107,17 +109,10 @@ class Transcoder implements TranscoderInterface
 		/** @var string[] */
 		$data = mb_str_split($string);
 
-		// unlike str_split, mb_str_split returns empty array on empty string
-		// so we are save here...
 		if ($chars = array_diff($data, $this->alphabet)) {
 			$exception = new InvalidCharsException('String contains invalid chars');
 			$exception->setChars($chars);
 			throw $exception;
-		}
-
-		if (!$this->flipped) {
-			/** @var int[] */
-			$this->flipped = array_flip($this->alphabet);
 		}
 
 		foreach ($data as $index => $char) {

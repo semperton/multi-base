@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Semperton\Multibase;
 
-final class Base85 extends Transcoder
+use Semperton\Multibase\Transcoder\BaseTranscoder;
+
+/**
+ * RFC 1924
+ * @see https://datatracker.ietf.org/doc/html/rfc1924
+ */
+final class Base85 extends BaseTranscoder
 {
-	/**
-	 * @see https://datatracker.ietf.org/doc/html/rfc1924
-	 */
 	public function __construct()
 	{
 		parent::__construct('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~');

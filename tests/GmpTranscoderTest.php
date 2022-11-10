@@ -5,13 +5,20 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use Semperton\Multibase\Exception\DublicateCharsException;
 use Semperton\Multibase\Exception\InvalidCharsException;
-use Semperton\Multibase\Transcoder;
+use Semperton\Multibase\Transcoder\GmpTranscoder;
 
-final class TranscoderTest extends TestCase
+final class GmpTranscoderTest extends TestCase
 {
+	protected function setUp(): void
+	{
+		if (!function_exists('gmp_init')) {
+			$this->markTestSkipped('GMP extension is not installed');
+		}
+	}
+
 	public function testHex(): void
 	{
-		$transcoder = new Transcoder('0123456789abcdef');
+		$transcoder = new GmpTranscoder('0123456789abcdef');
 		$data = 'Hello World';
 
 		$encoded = $transcoder->encode($data);
@@ -33,7 +40,7 @@ final class TranscoderTest extends TestCase
 
 	public function testMultibyte(): void
 	{
-		$transcoder = new Transcoder(
+		$transcoder = new GmpTranscoder(
 			'🧳🌂☂️🧵🪡🪢🧶👓🕶🥽🥼🦺👔👕👖🧣🧤🧥🧦👗👘🥻🩴🩱🩲' .
 				'🩳👙👚👛👜👝🎒👞👟🥾🥿👠👡🩰👢👑👒🎩🎓🧢⛑🪖💄💍💼'
 		);
@@ -50,7 +57,7 @@ final class TranscoderTest extends TestCase
 	public function testInvalidDecodeChars(): void
 	{
 		try {
-			$transcoder = new Transcoder('0123456789abcdef');
+			$transcoder = new GmpTranscoder('0123456789abcdef');
 			$transcoder->decode('1Acf=');
 		} catch (InvalidCharsException $ex) {
 			$this->assertSame([1 => 'A', 4 => '='], $ex->getChars());
@@ -60,7 +67,7 @@ final class TranscoderTest extends TestCase
 	public function testDublicateAlphabetChars(): void
 	{
 		try {
-			$transcoder = new Transcoder('aBCadeff');
+			$transcoder = new GmpTranscoder('aBCadeff');
 		} catch (DublicateCharsException $ex) {
 			$this->assertSame([3 => 'a', 7 => 'f'], $ex->getChars());
 		}
@@ -68,7 +75,7 @@ final class TranscoderTest extends TestCase
 
 	public function testEmptyDecodeString(): void
 	{
-		$transcoder = new Transcoder('0123456789');
+		$transcoder = new GmpTranscoder('0123456789');
 		$encoded = $transcoder->decode('');
 
 		$this->assertEquals('', $encoded);
@@ -76,7 +83,7 @@ final class TranscoderTest extends TestCase
 
 	public function testEmptyEncodeString(): void
 	{
-		$transcoder = new Transcoder('0123456789');
+		$transcoder = new GmpTranscoder('0123456789');
 		$encoded = $transcoder->encode('');
 
 		$this->assertEquals('', $encoded);
