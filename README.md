@@ -17,7 +17,7 @@ composer require semperton/multibase
 ```
 Multibase requires PHP 7.4+ and the mbstring extension
 
-> Tip: Install the GMP extension for faster base conversion
+> Tip: Install the GMP extension for faster base conversion up to base 62
 
 ## Package
 Included base transcoders:
