@@ -17,6 +17,8 @@ composer require semperton/multibase
 ```
 Multibase requires PHP 7.4+ and the mbstring extension
 
+> Tip: Install the GMP extension for faster base conversion
+
 ## Package
 Included base transcoders:
 - Base58
@@ -56,13 +58,13 @@ You can create custom transcoders with your own alphabets (multibyte support).
 Just for fun, how about an emoji transcoder?
 
 ```php
-use Semperton\Multibase\Transcoder;
+use Semperton\Multibase\Transcoder\BaseTranscoder;
 
-$emojiTranscoder = new Transcoder(
+$emojiTranscoder = new BaseTranscoder(
 	'🧳🌂☂️🧵🪡🪢🧶👓🕶🥽🥼🦺👔👕👖🧣🧤🧥🧦👗👘🥻🩴🩱🩲' .
 	'🩳👙👚👛👜👝🎒👞👟🥾🥿👠👡🩰👢👑👒🎩🎓🧢⛑🪖💄💍💼'
 );
 
-$encoded = $transcoder->encode('Hello World'); // ☂🪢👟🩴🩰🥻👚👙🧢🩲🧥🥽🎩👙👝🎒
-$transcoder->decode($encoded); // Hello World
+$encoded = $emojiTranscoder->encode('Hello World'); // ☂🪢👟🩴🩰🥻👚👙🧢🩲🧥🥽🎩👙👝🎒
+$emojiTranscoder->decode($encoded); // Hello World
 ```
