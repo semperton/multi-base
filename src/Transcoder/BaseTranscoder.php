@@ -31,4 +31,15 @@ class BaseTranscoder implements TranscoderInterface
 	{
 		return $this->transcoder->decode($string);
 	}
+
+	public function intEncode(int $num): string
+	{
+		return $this->transcoder->encode(pack('J', $num));
+	}
+
+	public function intDecode(string $string): int
+	{
+		$data = $this->transcoder->decode($string);
+		return (int)unpack('J', $data)[1];
+	}
 }
