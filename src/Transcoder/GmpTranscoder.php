@@ -9,11 +9,12 @@ use Semperton\Multibase\Exception\InvalidAlphabetException;
 use Semperton\Multibase\Exception\InvalidCharsException;
 
 use function mb_str_split;
-use function array_diff;
 use function array_diff_key;
 use function array_unique;
 use function array_flip;
 use function array_combine;
+use function array_values;
+use function preg_match_all;
 use function count;
 use function substr;
 use function strtolower;
@@ -31,11 +32,13 @@ final class GmpTranscoder implements TranscoderInterface
 
 	protected int $base;
 
-	/** @var array<string, string> */
-	protected array $dict;
+	protected string $regex;
 
 	/** @var array<string, string> */
-	protected array $flipped;
+	protected ?array $dict = null;
+
+	/** @var array<string, string> */
+	protected ?array $flipped = null;
 
 	public function __construct(string $alphabet)
 	{
@@ -49,27 +52,23 @@ final class GmpTranscoder implements TranscoderInterface
 
 		if ($chars = array_diff_key($alpha, array_unique($alpha))) {
 			$exception = new DublicateCharsException('Alphabet contains dublicate chars');
-			$exception->setChars(array_unique($chars));
+			$exception->setChars(array_values(array_unique($chars)));
 			throw $exception;
 		}
 
-		$this->dict = $this->getDictionary($alpha);
-		$this->flipped = array_flip($this->dict);
-	}
+		$this->regex = '/[^' . preg_quote($alphabet) . ']/u';
 
-	/**
-	 * @param string[] $alphabet
-	 * @return array<string, string>
-	 */
-	protected function getDictionary(array $alphabet): array
-	{
 		$gmp = substr(self::GMP, 0, $this->base);
 
 		if ($this->base <= 36) {
 			$gmp = strtolower($gmp);
 		}
 
-		return array_combine(str_split($gmp), $alphabet);
+		if ($gmp !== $alphabet) {
+			/** @var array<string, string> */
+			$this->dict = array_combine(str_split($gmp), $alpha);
+			$this->flipped = array_flip($this->dict);
+		}
 	}
 
 	public function encode(string $string): string
@@ -80,13 +79,18 @@ final class GmpTranscoder implements TranscoderInterface
 
 		$hex = bin2hex($string);
 
-		$data = gmp_strval(gmp_init($hex, 16), $this->base);
-		$result = strtr($data, $this->dict);
+		$result = gmp_strval(gmp_init($hex, 16), $this->base);
+		$zero = '0';
+
+		if ($this->dict) {
+			$result = strtr($result, $this->dict);
+			/** @psalm-suppress InvalidArrayOffset */
+			$zero = $this->dict['0'];
+		}
 
 		// zero padding
-		for ($i = 0; isset($hex[$i + 2]) && $hex[$i] === '0' && $hex[$i + 1] === '0'; $i += 2) {
-			/** @psalm-suppress InvalidArrayOffset */
-			$result = $this->dict['0'] . $result;
+		for ($i = 0; isset($hex[$i + 2]) && $hex[$i] . $hex[$i + 1] === '00'; $i += 2) {
+			$result = $zero . $result;
 		}
 
 		return $result;
@@ -98,22 +102,24 @@ final class GmpTranscoder implements TranscoderInterface
 			return $string;
 		}
 
-		if ($chars = array_diff(mb_str_split($string), $this->dict)) {
+		if (preg_match_all($this->regex, $string, $matches)) {
 			$exception = new InvalidCharsException('String contains invalid chars');
-			/** @var string[] $chars */
-			$exception->setChars($chars);
+			$exception->setChars(array_values(array_unique($matches[0])));
 			throw $exception;
 		}
 
-		$replaced = strtr($string, $this->flipped);
-		$hex = gmp_strval(gmp_init($replaced, $this->base), 16);
+		if ($this->flipped) {
+			$string = strtr($string, $this->flipped);
+		}
+
+		$hex = gmp_strval(gmp_init($string, $this->base), 16);
 
 		if (strlen($hex) % 2) {
 			$hex = '0' . $hex;
 		}
 
 		// zeros
-		for ($i = 0; isset($replaced[$i + 1]) && $replaced[$i] === '0'; $i++) {
+		for ($i = 0; isset($string[$i + 1]) && $string[$i] === '0'; $i++) {
 			$hex =  '00' . $hex;
 		}
 
