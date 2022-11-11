@@ -58,18 +58,18 @@ final class GmpTranscoderTest extends TestCase
 	{
 		try {
 			$transcoder = new GmpTranscoder('0123456789abcdef');
-			$transcoder->decode('1Acf=');
+			$transcoder->decode('🥽1Acf==♪');
 		} catch (InvalidCharsException $ex) {
-			$this->assertSame([1 => 'A', 4 => '='], $ex->getChars());
+			$this->assertSame(['🥽', 'A', '=', '♪'], $ex->getChars());
 		}
 	}
 
 	public function testDublicateAlphabetChars(): void
 	{
 		try {
-			$transcoder = new GmpTranscoder('aBCadeff');
+			$transcoder = new GmpTranscoder('aBCadeffa');
 		} catch (DublicateCharsException $ex) {
-			$this->assertSame([3 => 'a', 7 => 'f'], $ex->getChars());
+			$this->assertSame(['a', 'f'], $ex->getChars());
 		}
 	}
 

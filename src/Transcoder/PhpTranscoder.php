@@ -41,7 +41,7 @@ final class PhpTranscoder implements TranscoderInterface
 
 		if ($chars = array_diff_key($this->alphabet, array_unique($this->alphabet))) {
 			$exception = new DublicateCharsException('Alphabet contains dublicate chars');
-			$exception->setChars(array_unique($chars));
+			$exception->setChars(array_values(array_unique($chars)));
 			throw $exception;
 		}
 
@@ -111,7 +111,7 @@ final class PhpTranscoder implements TranscoderInterface
 
 		if ($chars = array_diff($data, $this->alphabet)) {
 			$exception = new InvalidCharsException('String contains invalid chars');
-			$exception->setChars($chars);
+			$exception->setChars(array_values(array_unique($chars)));
 			throw $exception;
 		}
 
