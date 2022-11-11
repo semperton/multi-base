@@ -6,6 +6,8 @@ namespace Semperton\Multibase\Transcoder;
 
 use function mb_strlen;
 use function function_exists;
+use function pack;
+use function unpack;
 
 class BaseTranscoder implements TranscoderInterface
 {
